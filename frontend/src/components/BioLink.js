@@ -125,18 +125,26 @@ const BioLink = () => {
     if (!discordData) return bioData.defaultProfile.username;
     
     const activities = discordData.activities || [];
-    const customStatus = activities.find(a => a.type === 4);
     
+    // Check for Spotify (type 2)
+    const spotify = activities.find(a => a.type === 2);
+    if (spotify) {
+      return `🎵 Listening to ${spotify.details}`;
+    }
+    
+    // Check for custom status (type 4)
+    const customStatus = activities.find(a => a.type === 4);
     if (customStatus && customStatus.state) {
       return customStatus.state;
     }
     
-    const activity = activities.find(a => a.type === 0); // Playing
+    // Check for playing game (type 0)
+    const activity = activities.find(a => a.type === 0);
     if (activity) {
       return `Playing ${activity.name}`;
     }
     
-    // Calculate last seen
+    // Show offline if not online
     if (discordData.discord_status === 'offline') {
       return 'Offline';
     }
