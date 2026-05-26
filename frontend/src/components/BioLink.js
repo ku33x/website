@@ -36,14 +36,30 @@ const BioLink = () => {
     videoUrl: "",
   };
 
-  // Fetch Discord status from Lanyard API
+  // Fetch Discord status from our backend API
   const fetchDiscordStatus = async () => {
     try {
-      const response = await fetch(`https://api.lanyard.rest/v1/users/${bioData.discordUserId}`);
-      const data = await response.json();
+      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${BACKEND_URL}/api/discord/user/${bioData.discordUserId}`);
+      const result = await response.json();
       
-      if (data.success) {
-        setDiscordData(data.data);
+      if (result.success) {
+        // Merge with Lanyard data for status
+        const lanyardResponse = await fetch(`https://api.lanyard.rest/v1/users/${bioData.discordUserId}`);
+        const lanyardData = await lanyardResponse.json();
+        
+        // Combine bot API data (for badges) with Lanyard data (for status)
+        const combinedData = {
+          discord_user: {
+            ...result.data,
+            public_flags: result.data.public_flags
+          },
+          discord_status: lanyardData.success ? lanyardData.data.discord_status : 'offline',
+          activities: lanyardData.success ? lanyardData.data.activities : []
+        };
+        
+        console.log('Discord public_flags:', result.data.public_flags);
+        setDiscordData(combinedData);
       }
       setLoading(false);
     } catch (error) {

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 import uuid
 from datetime import datetime, timezone
+import httpx
 
 
 ROOT_DIR = Path(__file__).parent
@@ -65,6 +66,53 @@ async def get_status_checks():
             check['timestamp'] = datetime.fromisoformat(check['timestamp'])
     
     return status_checks
+
+@api_router.get("/discord/user/{user_id}")
+async def get_discord_user(user_id: str):
+    """Fetch Discord user data including badges using bot token"""
+    discord_bot_token = os.environ.get('DISCORD_BOT_TOKEN')
+    
+    if not discord_bot_token:
+        raise HTTPException(status_code=500, detail="Discord bot token not configured")
+    
+    headers = {
+        "Authorization": f"Bot {discord_bot_token}",
+        "Content-Type": "application/json"
+    }
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            # Fetch user data from Discord API
+            response = await client.get(
+                f"https://discord.com/api/v10/users/{user_id}",
+                headers=headers,
+                timeout=10.0
+            )
+            
+            if response.status_code == 404:
+                raise HTTPException(status_code=404, detail="Discord user not found")
+            elif response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, detail="Discord API error")
+            
+            user_data = response.json()
+            
+            return {
+                "success": True,
+                "data": {
+                    "id": user_data.get("id"),
+                    "username": user_data.get("username"),
+                    "discriminator": user_data.get("discriminator"),
+                    "avatar": user_data.get("avatar"),
+                    "public_flags": user_data.get("public_flags", 0),
+                    "avatar_url": f"https://cdn.discordapp.com/avatars/{user_data.get('id')}/{user_data.get('avatar')}.png?size=128" if user_data.get('avatar') else None
+                }
+            }
+            
+        except httpx.TimeoutException:
+            raise HTTPException(status_code=504, detail="Discord API timeout")
+        except httpx.RequestError as e:
+            logger.error(f"Discord API request error: {e}")
+            raise HTTPException(status_code=500, detail="Failed to fetch Discord data")
 
 # Include the router in the main app
 app.include_router(api_router)
