@@ -49,33 +49,20 @@ const BioLink = () => {
     videoUrl: "/video.mp4",
   };
 
-  // Fetch Discord status from our backend API
+  // Fetch Discord status from Lanyard API directly
   const fetchDiscordStatus = async () => {
     try {
-      const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-      const response = await fetch(`${BACKEND_URL}/api/discord/user/${bioData.discordUserId}`);
-      const result = await response.json();
+      const lanyardResponse = await fetch(`https://api.lanyard.rest/v1/users/${bioData.discordUserId}`);
+      const lanyardData = await lanyardResponse.json();
       
-      if (result.success) {
-        // Merge with Lanyard data for status and Spotify
-        const lanyardResponse = await fetch(`https://api.lanyard.rest/v1/users/${bioData.discordUserId}`);
-        const lanyardData = await lanyardResponse.json();
-        
-        // Combine bot API data (for badges) with Lanyard data (for status and Spotify)
-        const combinedData = {
-          discord_user: {
-            ...result.data,
-            public_flags: result.data.public_flags
-          },
-          discord_status: lanyardData.success ? lanyardData.data.discord_status : 'offline',
-          activities: lanyardData.success ? lanyardData.data.activities : [],
-          spotify: lanyardData.success ? lanyardData.data.spotify : null,
-          listening_to_spotify: lanyardData.success ? lanyardData.data.listening_to_spotify : false
-        };
-        
-        console.log('Discord public_flags:', result.data.public_flags);
-        console.log('Listening to Spotify:', combinedData.listening_to_spotify);
-        setDiscordData(combinedData);
+      if (lanyardData.success) {
+        setDiscordData({
+          discord_user: lanyardData.data.discord_user,
+          discord_status: lanyardData.data.discord_status,
+          activities: lanyardData.data.activities || [],
+          spotify: lanyardData.data.spotify,
+          listening_to_spotify: lanyardData.data.listening_to_spotify
+        });
       }
       setLoading(false);
     } catch (error) {
