@@ -20,7 +20,7 @@ const BioLink = () => {
   // ========================================
   const bioData = {
     // Your Discord User ID (for live status)
-    discordUserId: "178906698440900608",
+    discordUserId: "651336986019495937",
     
     // Manual badges (since Discord API doesn't expose them)
     manualBadges: [],
@@ -36,12 +36,12 @@ const BioLink = () => {
       { 
         logo: "/youtube-logo.png",
         name: "YouTube",
-        url: "https://youtube.com/channel/UCDHRfbbfEepcVRJ7qqDQk9g",
+        url: "https://www.youtube.com/@gtbshieldgang",
       },
       { 
         logo: "/roblox-logo.png",
         name: "Roblox",
-        url: "https://www.roblox.com/users/504314066/profile",
+        url: "https://www.roblox.com/users/1218134282/profile",
       },
     ],
     
