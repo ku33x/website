@@ -39,7 +39,7 @@ jobs:
           CI: false
 
       - name: Add CNAME
-        run: echo "vuhnra.wtf" > ./frontend/build/CNAME
+        run: echo "bladee.fyi" > ./frontend/build/CNAME
 
       - name: Add .nojekyll
         run: touch ./frontend/build/.nojekyll
