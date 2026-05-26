@@ -258,13 +258,13 @@ const BioLink = () => {
           }`}
           data-testid="profile-card"
         >
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl px-3 py-3 flex items-center gap-3 hover:bg-white/10 transition-all duration-200">
+          <div className="flex items-center gap-3 hover:opacity-90 transition-opacity duration-200">
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <img
                 src={avatar}
                 alt="Profile"
-                className="w-16 h-16 rounded-full border-2 border-white/20"
+                className="w-16 h-16 rounded-full border-2 border-white/10 shadow-lg"
                 data-testid="profile-avatar"
               />
               {/* Live status indicator */}
