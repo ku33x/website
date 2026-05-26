@@ -47,21 +47,24 @@ const BioLink = () => {
       const result = await response.json();
       
       if (result.success) {
-        // Merge with Lanyard data for status
+        // Merge with Lanyard data for status and Spotify
         const lanyardResponse = await fetch(`https://api.lanyard.rest/v1/users/${bioData.discordUserId}`);
         const lanyardData = await lanyardResponse.json();
         
-        // Combine bot API data (for badges) with Lanyard data (for status)
+        // Combine bot API data (for badges) with Lanyard data (for status and Spotify)
         const combinedData = {
           discord_user: {
             ...result.data,
             public_flags: result.data.public_flags
           },
           discord_status: lanyardData.success ? lanyardData.data.discord_status : 'offline',
-          activities: lanyardData.success ? lanyardData.data.activities : []
+          activities: lanyardData.success ? lanyardData.data.activities : [],
+          spotify: lanyardData.success ? lanyardData.data.spotify : null,
+          listening_to_spotify: lanyardData.success ? lanyardData.data.listening_to_spotify : false
         };
         
         console.log('Discord public_flags:', result.data.public_flags);
+        console.log('Listening to Spotify:', combinedData.listening_to_spotify);
         setDiscordData(combinedData);
       }
       setLoading(false);
