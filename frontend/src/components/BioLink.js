@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Youtube, Gamepad2 } from 'lucide-react';
+import { Youtube, Gamepad2 } from 'lucide-react';
 
 const BioLink = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -19,7 +19,6 @@ const BioLink = () => {
     // Default profile info (will be replaced by live Discord data)
     defaultProfile: {
       username: "realhvh",
-      badge: "🔱",
       avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
     },
     
@@ -69,6 +68,35 @@ const BioLink = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Get Discord badges from public_flags
+  const getDiscordBadges = (publicFlags) => {
+    const badges = [];
+    
+    if (!publicFlags) return badges;
+    
+    const BADGES = {
+      STAFF: { bit: 1 << 0, icon: 'https://cdn.discordapp.com/badge-icons/5e74e9b61934fc1f67c65515d1f7e60d.png', name: 'Discord Staff' },
+      PARTNER: { bit: 1 << 1, icon: 'https://cdn.discordapp.com/badge-icons/3f9748e53446a137a052f3454e2de41e.png', name: 'Partnered Server Owner' },
+      HYPESQUAD: { bit: 1 << 2, icon: 'https://cdn.discordapp.com/badge-icons/bf01d1073931f921909045f3a39fd264.png', name: 'HypeSquad Events' },
+      BUG_HUNTER_LEVEL_1: { bit: 1 << 3, icon: 'https://cdn.discordapp.com/badge-icons/2717692c7dca7289b35297368a940dd0.png', name: 'Bug Hunter Level 1' },
+      HYPESQUAD_BRAVERY: { bit: 1 << 6, icon: 'https://cdn.discordapp.com/badge-icons/8a88d63823d8a71cd5e390baa45efa02.png', name: 'HypeSquad Bravery' },
+      HYPESQUAD_BRILLIANCE: { bit: 1 << 7, icon: 'https://cdn.discordapp.com/badge-icons/011940fd013da3f7fb926e4a1cd2e618.png', name: 'HypeSquad Brilliance' },
+      HYPESQUAD_BALANCE: { bit: 1 << 8, icon: 'https://cdn.discordapp.com/badge-icons/3aa41de486fa12454c3761e8e223442e.png', name: 'HypeSquad Balance' },
+      EARLY_SUPPORTER: { bit: 1 << 9, icon: 'https://cdn.discordapp.com/badge-icons/7060786766c9c840eb3019e725d2b358.png', name: 'Early Supporter' },
+      BUG_HUNTER_LEVEL_2: { bit: 1 << 14, icon: 'https://cdn.discordapp.com/badge-icons/848f79194d4be5ff5f81505cbd0ce1e6.png', name: 'Bug Hunter Level 2' },
+      VERIFIED_DEVELOPER: { bit: 1 << 17, icon: 'https://cdn.discordapp.com/badge-icons/6bdc42827a38498929a4920da12695d9.png', name: 'Early Verified Bot Developer' },
+      ACTIVE_DEVELOPER: { bit: 1 << 22, icon: 'https://cdn.discordapp.com/badge-icons/6df5892e0f35b051f8b61eace34f4967.png', name: 'Active Developer' },
+    };
+    
+    Object.entries(BADGES).forEach(([key, badge]) => {
+      if ((publicFlags & badge.bit) === badge.bit) {
+        badges.push(badge);
+      }
+    });
+    
+    return badges;
+  };
+
   // Get status color
   const getStatusColor = (status) => {
     switch (status) {
@@ -108,6 +136,7 @@ const BioLink = () => {
     ? `https://cdn.discordapp.com/avatars/${discordData.discord_user.id}/${discordData.discord_user.avatar}.png?size=128`
     : bioData.defaultProfile.avatar;
   const status = discordData?.discord_status || 'offline';
+  const badges = getDiscordBadges(discordData?.discord_user?.public_flags);
 
   const BioLinkButton = ({ icon: Icon, label, url, color }) => {
     return (
@@ -174,13 +203,13 @@ const BioLink = () => {
           }`}
           data-testid="profile-card"
         >
-          <div className="bg-[#2b2d31] border border-[#3f4147] rounded-2xl p-4 flex items-center gap-4 min-w-[280px] hover:bg-[#313338] transition-colors duration-200">
+          <div className="bg-[#2b2d31]/30 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex items-center gap-4 min-w-[280px] hover:bg-[#2b2d31]/40 transition-all duration-200">
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <img
                 src={avatar}
                 alt="Profile"
-                className="w-16 h-16 rounded-full border-2 border-[#3f4147]"
+                className="w-16 h-16 rounded-full border-2 border-[#3f4147]/50"
                 data-testid="profile-avatar"
               />
               {/* Live status indicator */}
@@ -197,10 +226,17 @@ const BioLink = () => {
                 <span className="text-white font-semibold text-lg truncate" data-testid="username">
                   {username}
                 </span>
-                {bioData.defaultProfile.badge && (
-                  <span className="text-base">{bioData.defaultProfile.badge}</span>
-                )}
-                <Shield size={16} className="text-[#5865f2] fill-current" />
+                {/* Discord Badges */}
+                {badges.map((badge, index) => (
+                  <img 
+                    key={index}
+                    src={badge.icon} 
+                    alt={badge.name}
+                    title={badge.name}
+                    className="w-5 h-5"
+                    data-testid={`badge-${index}`}
+                  />
+                ))}
               </div>
               <p className="text-[#b5bac1] text-sm truncate" data-testid="status">
                 {loading ? 'Loading...' : getStatusText()}
