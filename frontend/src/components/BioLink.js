@@ -21,12 +21,12 @@ const BioLink = () => {
     // Bio Links - Official logos only, no text
     bioLinks: [
       { 
-        logo: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png",
+        logo: "/youtube-logo.png",
         name: "YouTube",
         url: "https://youtube.com/@YOUR_CHANNEL",
       },
       { 
-        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Roblox_Logo_2022.svg/2048px-Roblox_Logo_2022.svg.png",
+        logo: "/roblox-logo.png",
         name: "Roblox",
         url: "https://www.roblox.com/users/YOUR_ID/profile",
       },
@@ -138,14 +138,13 @@ const BioLink = () => {
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="group relative px-8 py-5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300 flex items-center justify-center"
+        className="group transition-all duration-300"
         data-testid={`link-${name.toLowerCase()}`}
       >
         <img 
           src={logo} 
           alt={name}
-          className="h-8 w-auto object-contain grayscale brightness-0 invert opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-          style={{ filter: 'grayscale(100%) brightness(0) invert(1)' }}
+          className="h-12 w-12 object-contain opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300"
         />
       </a>
     );
@@ -228,7 +227,7 @@ const BioLink = () => {
 
         {/* Bio Links - Logo Only */}
         <div 
-          className={`flex gap-4 transition-all duration-1000 delay-100 transform ${
+          className={`flex gap-6 transition-all duration-1000 delay-100 transform ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
